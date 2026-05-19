@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Mahé Barbry</title>
+  <meta name="description" content="Contacter Mahé Barbry, artiste peintre. Demandes d'acquisition, renseignements sur les œuvres.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="contact-page">
+
+  <!-- ── NAVIGATION ── -->
+  <nav class="nav nav--solid" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__name">Mahé Barbry</a>
+      <ul class="nav__links">
+        <li><a href="galerie.html"  class="nav__link">Œuvres</a></li>
+        <li><a href="a-propos.html" class="nav__link">À propos</a></li>
+        <li><a href="contact.html"  class="nav__link nav__link--active">Contact</a></li>
+      </ul>
+      <button class="nav__toggle" id="navToggle" aria-label="Menu">Menu</button>
+    </div>
+  </nav>
+
+  <div class="nav-overlay" id="navOverlay">
+    <button class="nav-overlay__close" id="navClose">Fermer</button>
+    <a href="galerie.html"  class="nav-overlay__link">Œuvres</a>
+    <a href="a-propos.html" class="nav-overlay__link">À propos</a>
+    <a href="contact.html"  class="nav-overlay__link">Contact</a>
+  </div>
+
+  <!-- ── TITRE ── -->
+  <div class="contact-top">
+    <span class="label">Contact</span>
+    <h1 class="contact-top__title">Entrons<br>en contact</h1>
+  </div>
+
+  <!-- ── LAYOUT ── -->
+  <div class="contact-layout">
+
+    <!-- Informations -->
+    <div class="contact-info">
+      <p class="contact-info__sub">
+        Pour toute demande au sujet d'une œuvre, d'une exposition
+        ou d'une collaboration, n'hésitez pas à m'écrire directement.
+        Je réponds à chaque message avec soin.
+      </p>
+
+      <div class="contact-info__item">
+        <span class="contact-info__key">Email</span>
+        <a href="mailto:mahebarbry@gmail.com" class="contact-info__value">
+          mahebarbry@gmail.com
+        </a>
+      </div>
+
+      <div class="contact-info__item">
+        <span class="contact-info__key">Instagram</span>
+        <a href="https://www.instagram.com/mahe_barbry/" target="_blank" rel="noopener" class="contact-info__value">
+          @mahe_barbry
+        </a>
+      </div>
+
+      <div class="contact-info__item">
+        <span class="contact-info__key">Atelier</span>
+        <span class="contact-info__value" style="font-style: normal; font-family: var(--font-sans); font-size: 0.9rem;">
+          Agen, France<br>
+          Visites sur rendez-vous
+        </span>
+      </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div>
+      <p class="contact-form__title">Envoyez un message</p>
+      <form action="#" method="post">
+
+        <div class="form-group">
+          <label class="form-label" for="c-name">Votre nom</label>
+          <input class="form-input" type="text" id="c-name" name="name"
+            placeholder="Mahé Barbry" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="c-email">Adresse email</label>
+          <input class="form-input" type="email" id="c-email" name="email"
+            placeholder="votre@email.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="c-subject">Sujet</label>
+          <input class="form-input" type="text" id="c-subject" name="subject"
+            placeholder="Renseignement sur une œuvre, collaboration…">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="c-message">Message</label>
+          <textarea class="form-textarea" id="c-message" name="message"
+            placeholder="Votre message…" rows="5" required></textarea>
+        </div>
+
+        <button type="submit" class="btn">Envoyer</button>
+
+      </form>
+    </div>
+
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__name">Mahé Barbry</span>
+      <nav class="footer__nav">
+        <a href="galerie.html">Œuvres</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <span class="footer__copy">© 2024 Mahé Barbry</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

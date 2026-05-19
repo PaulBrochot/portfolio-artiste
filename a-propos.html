@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>À propos — Mahé Barbry</title>
+  <meta name="description" content="Démarche et biographie de Mahé Barbry, artiste peintre.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav class="nav nav--solid" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__name">Mahé Barbry</a>
+      <ul class="nav__links">
+        <li><a href="galerie.html"  class="nav__link">Œuvres</a></li>
+        <li><a href="a-propos.html" class="nav__link nav__link--active">À propos</a></li>
+        <li><a href="contact.html"  class="nav__link">Contact</a></li>
+      </ul>
+      <button class="nav__toggle" id="navToggle" aria-label="Menu">Menu</button>
+    </div>
+  </nav>
+
+  <div class="nav-overlay" id="navOverlay">
+    <button class="nav-overlay__close" id="navClose">Fermer</button>
+    <a href="galerie.html"  class="nav-overlay__link">Œuvres</a>
+    <a href="a-propos.html" class="nav-overlay__link">À propos</a>
+    <a href="contact.html"  class="nav-overlay__link">Contact</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section class="about-hero page-top">
+    <div class="about-hero__image">
+      <!-- ↓ Remplacer par portrait ou photo d'atelier -->
+      <img
+        src="images/portrait.jpg"
+        alt="Mahé Barbry"
+        loading="eager"
+      >
+    </div>
+    <div class="about-hero__content">
+      <p class="label">L'artiste</p>
+      <h1 class="about-hero__name">Prénom<br>Nom</h1>
+      <p class="about-hero__intro">
+        Né(e) en Castres. Vit et travaille à Agen.
+        Une pratique centrée sur la peinture — la matière, le geste, le temps.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── DÉMARCHE ── -->
+  <section class="about-content">
+    <div>
+      <p class="label">Démarche</p>
+    </div>
+    <div class="about-body">
+
+      <p class="pull">
+        Je peins ce que l'on ne peut pas nommer. Ces états de présence
+        à la limite du visible — quand la lumière hésite, quand la matière
+        cède avant de tenir.
+      </p>
+
+      <p>
+        Mon travail prend racine dans l'observation minutieuse du monde physique —
+        la géologie, la lumière rasante, les surfaces usées par le temps.
+        Mais ce n'est jamais une représentation fidèle. C'est une mémoire :
+        ce que la sensation laisse après avoir traversé le corps.
+      </p>
+
+      <p>
+        Je travaille à l'huile, à l'acrylique, parfois en technique mixte.
+        La toile de lin, le panneau de bois, le papier marouflé — chaque support
+        impose sa logique, sa résistance, son rythme. Je ne choisis pas un support
+        par habitude, mais pour ce qu'il permet ou interdit.
+      </p>
+
+      <p>
+        Le geste est lent. Les couches s'accumulent, disparaissent, réapparaissent.
+        Une œuvre peut durer plusieurs mois avant de trouver son équilibre.
+        Il n'y a pas d'esquisse préalable — la composition se découvre dans le faire.
+      </p>
+
+      <p>
+        Ce qui m'intéresse, c'est cette zone incertaine entre l'abstraction et la trace
+        du réel : là où l'on reconnaît quelque chose sans pouvoir le nommer exactement.
+        Une surface noire qui devient profondeur. Une lumière qui tremble
+        sans jamais tout à fait se révéler.
+      </p>
+
+      <p class="pull" style="margin-top: 16px;">
+        « Peindre, c'est rester dans l'incertitude assez longtemps pour
+        que quelque chose de juste apparaisse. »
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ── EXPOSITIONS (optionnel) ── -->
+  <section class="about-content" style="padding-top: 0; border-top: none;">
+    <div>
+      <p class="label">Expositions</p>
+    </div>
+    <div class="about-body">
+      <p>
+        — [Titre de l'exposition], [Galerie / Lieu], [Ville], [Année]<br>
+        — [Titre de l'exposition], [Galerie / Lieu], [Ville], [Année]<br>
+        — [Titre de l'exposition], [Galerie / Lieu], [Ville], [Année]
+      </p>
+      <p style="margin-top: 8px;">
+        <a href="contact.html" class="link-arrow">Me contacter pour d'autres informations</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__name">Mahé Barbry</span>
+      <nav class="footer__nav">
+        <a href="galerie.html">Œuvres</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <span class="footer__copy">© 2024 Mahé Barbry</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahé Barbry — Artiste peintre</title>
+  <meta name="description" content="Portfolio de Mahé Barbry, artiste peintre. Peintures figuratives, expressionnistes, néo-pop.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__name">Mahé Barbry</a>
+      <ul class="nav__links">
+        <li><a href="galerie.html"  class="nav__link">Œuvres</a></li>
+        <li><a href="a-propos.html" class="nav__link">À propos</a></li>
+        <li><a href="contact.html"  class="nav__link">Contact</a></li>
+      </ul>
+      <button class="nav__toggle" id="navToggle" aria-label="Menu">Menu</button>
+    </div>
+  </nav>
+
+  <div class="nav-overlay" id="navOverlay">
+    <button class="nav-overlay__close" id="navClose">Fermer</button>
+    <a href="galerie.html"  class="nav-overlay__link">Œuvres</a>
+    <a href="a-propos.html" class="nav-overlay__link">À propos</a>
+    <a href="contact.html"  class="nav-overlay__link">Contact</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero__content">
+      <p class="label hero__eyebrow">Artiste peintre</p>
+      <h1 class="hero__title">Mahé<br><em>Barbry</em></h1>
+      <p class="hero__caption">
+        Une peinture figurative et brute, entre culture populaire et
+        expressionnisme urbain — des personnages qui parlent fort, des couleurs
+        qui ne s'excusent pas.
+      </p>
+      <a href="galerie.html" class="link-arrow">Découvrir les œuvres</a>
+    </div>
+    <div class="hero__image">
+      <img
+        src="images/original-vulture.jpg"
+        alt="Original Vulture — Mahé Barbry"
+        loading="eager"
+      >
+    </div>
+  </section>
+
+  <!-- ── ŒUVRES RÉCENTES ── -->
+  <section class="home-works">
+    <div class="home-works__header">
+      <p class="label">Œuvres récentes</p>
+      <a href="galerie.html" class="link-arrow">Voir toutes les œuvres</a>
+    </div>
+
+    <div class="home-works__grid">
+
+      <!-- Vedette (span 2 colonnes) -->
+      <a href="oeuvres/oeuvre-1.html" class="work-item">
+        <div class="work-item__img-wrap">
+          <img src="images/gloire-paillettes.jpg" alt="Gloire &amp; Paillettes" loading="lazy">
+        </div>
+        <div class="work-item__info">
+          <span class="work-item__title">Gloire &amp; Paillettes</span>
+          <span class="work-item__year">2024</span>
+        </div>
+        <p class="work-item__sub">Acrylique et paillettes sur toile — 130 × 100 cm</p>
+      </a>
+
+      <!-- Œuvre 2 -->
+      <a href="oeuvres/oeuvre-3.html" class="work-item">
+        <div class="work-item__img-wrap">
+          <img src="images/la-ville-qui-crie.jpg" alt="La Ville Qui Crie" loading="lazy">
+        </div>
+        <div class="work-item__info">
+          <span class="work-item__title">La Ville Qui Crie</span>
+          <span class="work-item__year">2023</span>
+        </div>
+        <p class="work-item__sub">Acrylique sur toile — 130 × 90 cm</p>
+      </a>
+
+      <!-- Œuvre 3 -->
+      <a href="oeuvres/oeuvre-4.html" class="work-item">
+        <div class="work-item__img-wrap">
+          <img src="images/de-la-democratie.jpg" alt="De la Démocratie" loading="lazy">
+        </div>
+        <div class="work-item__info">
+          <span class="work-item__title">De la Démocratie</span>
+          <span class="work-item__year">2025</span>
+        </div>
+        <p class="work-item__sub">Technique mixte sur toile — 90 × 120 cm</p>
+      </a>
+
+      <!-- Œuvre 4 -->
+      <a href="oeuvres/oeuvre-5.html" class="work-item">
+        <div class="work-item__img-wrap">
+          <img src="images/etoile-rouge.jpg" alt="Étoile Rouge" loading="lazy">
+        </div>
+        <div class="work-item__info">
+          <span class="work-item__title">Étoile Rouge</span>
+          <span class="work-item__year">2024</span>
+        </div>
+        <p class="work-item__sub">Acrylique sur carton — 40 × 60 cm</p>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ── DÉMARCHE ── -->
+  <section class="home-approach">
+    <div>
+      <p class="label">Démarche</p>
+    </div>
+    <div>
+      <p class="home-approach__quote">
+        « Des personnages qui existent déjà — quelque part entre le cartoon,
+        la rue et la peinture d'histoire. »
+      </p>
+      <p class="home-approach__body">
+        La peinture de Mahé Barbry convoque des figures hybrides, entre culture
+        populaire et expressionnisme urbain. Les couleurs sont franches, les
+        lignes sont épaisses, les sujets parlent fort. Chaque tableau est un
+        rapport de force entre l'image et le regardeur.
+      </p>
+      <a href="a-propos.html" class="link-arrow">En savoir plus sur la démarche</a>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="home-cta">
+    <p class="label">Renseignements</p>
+    <p class="title-md" style="margin: 28px 0 44px;">Pour toute demande<br>au sujet d'une œuvre</p>
+    <a href="contact.html" class="btn">Prendre contact</a>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__name">Mahé Barbry</span>
+      <nav class="footer__nav">
+        <a href="galerie.html">Œuvres</a>
+        <a href="a-propos.html">À propos</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <span class="footer__copy">© 2025 Mahé Barbry</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
