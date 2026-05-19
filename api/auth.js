@@ -39,21 +39,30 @@ module.exports = async function handler(req, res) {
       `));
     }
 
-    // Always write to localStorage (window.opener is nulled by GitHub's COOP headers)
-    // The admin page polls localStorage and dispatches the message event to Decap
+    // Store token in localStorage and keep popup open until admin page confirms receipt.
+    // (window.opener is nulled by GitHub's COOP — we can't use postMessage)
     res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
     res.setHeader('Content-Type', 'text/html');
     res.send(popup(`
-      <p>Authentification réussie, fermeture…</p>
+      <p>Connexion réussie — fermeture automatique…</p>
       <script>
       (function() {
         var token = ${JSON.stringify(tokenData.access_token)};
+        localStorage.removeItem('decap_token_received');
+        localStorage.setItem('decap_token', JSON.stringify({ token: token, ts: Date.now() }));
+        // Also try postMessage in case opener is somehow available
         var msg = 'authorization:github:success:' + JSON.stringify({ token: token, provider: 'github' });
-        // Store in localStorage — admin page polls for this
-        try { localStorage.setItem('decap_token', JSON.stringify({ token: token, ts: Date.now() })); } catch(e) {}
-        // Also try postMessage in case opener is available
         if (window.opener) { try { window.opener.postMessage(msg, '*'); } catch(e) {} }
-        setTimeout(function() { window.close(); }, 800);
+        // Wait for admin page to confirm receipt before closing
+        var deadline = Date.now() + 10000;
+        var check = setInterval(function() {
+          var received = localStorage.getItem('decap_token_received');
+          if (received || Date.now() > deadline) {
+            clearInterval(check);
+            localStorage.removeItem('decap_token_received');
+            window.close();
+          }
+        }, 200);
       })();
       </script>
     `));
