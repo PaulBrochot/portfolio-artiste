@@ -2,10 +2,18 @@ const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 module.exports = async function handler(req, res) {
-  const { code } = req.query;
+  const { code, error, error_description } = req.query;
   const protocol = req.headers['x-forwarded-proto'] || 'https';
   const host = req.headers['x-forwarded-host'] || req.headers.host;
   const origin = `${protocol}://${host}`;
+
+  // GitHub returned an error
+  if (error) {
+    return res.send(popup(`
+      <p style="color:red"><b>Erreur GitHub :</b> ${error}</p>
+      <p>${error_description || ''}</p>
+    `));
+  }
 
   // Step 1 — no code yet: redirect to GitHub OAuth
   if (!code) {
@@ -14,56 +22,78 @@ module.exports = async function handler(req, res) {
       redirect_uri: `${origin}/api/auth`,
       scope: 'repo,user'
     });
-    res.redirect(302, `https://github.com/login/oauth/authorize?${params}`);
-    return;
+    return res.redirect(302, `https://github.com/login/oauth/authorize?${params}`);
   }
 
   // Step 2 — exchange code for access token
   try {
     const https = require('https');
+    const tokenData = await githubTokenExchange(https, CLIENT_ID, CLIENT_SECRET, code);
 
-    const tokenData = await new Promise((resolve, reject) => {
-      const body = JSON.stringify({ client_id: CLIENT_ID, client_secret: CLIENT_SECRET, code });
-      const options = {
-        hostname: 'github.com',
-        path: '/login/oauth/access_token',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Content-Length': Buffer.byteLength(body)
-        }
-      };
-      const req2 = https.request(options, (r) => {
-        let raw = '';
-        r.on('data', chunk => raw += chunk);
-        r.on('end', () => { try { resolve(JSON.parse(raw)); } catch(e) { reject(e); } });
-      });
-      req2.on('error', reject);
-      req2.write(body);
-      req2.end();
-    });
-
-    if (!tokenData.access_token) {
-      res.status(401).send('Auth failed: ' + JSON.stringify(tokenData));
-      return;
+    if (tokenData.error || !tokenData.access_token) {
+      return res.send(popup(`
+        <p style="color:red"><b>Échange de token échoué :</b></p>
+        <pre>${JSON.stringify(tokenData, null, 2)}</pre>
+        <p>CLIENT_ID défini : ${CLIENT_ID ? 'oui' : 'NON'}</p>
+        <p>CLIENT_SECRET défini : ${CLIENT_SECRET ? 'oui' : 'NON'}</p>
+      `));
     }
 
-    // Send token back to Decap CMS via postMessage then close popup
+    // Send token to Decap CMS via postMessage
+    res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
     res.setHeader('Content-Type', 'text/html');
-    res.send(`<!DOCTYPE html><html><body><script>
-(function() {
-  var token = ${JSON.stringify(tokenData.access_token)};
-  var msg = 'authorization:github:success:' + JSON.stringify({ token: token, provider: 'github' });
-  if (window.opener) {
-    window.opener.postMessage(msg, '*');
-    setTimeout(function() { window.close(); }, 500);
-  } else {
-    document.body.innerText = 'Connecté. Vous pouvez fermer cette fenêtre.';
-  }
-})();
-</script></body></html>`);
+    res.send(popup(`
+      <p>Authentification réussie, fermeture…</p>
+      <script>
+      (function() {
+        var token = ${JSON.stringify(tokenData.access_token)};
+        var msg = 'authorization:github:success:' + JSON.stringify({ token: token, provider: 'github' });
+        var sent = false;
+        function trySend() {
+          if (window.opener) {
+            window.opener.postMessage(msg, '*');
+            sent = true;
+            setTimeout(function() { window.close(); }, 800);
+          }
+        }
+        trySend();
+        if (!sent) {
+          // Fallback: store in localStorage for the parent to pick up
+          try { localStorage.setItem('decap_token', JSON.stringify({ token: token, ts: Date.now() })); } catch(e) {}
+          setTimeout(function() { window.close(); }, 1500);
+        }
+      })();
+      </script>
+    `));
   } catch (err) {
-    res.status(500).send('Erreur: ' + err.message);
+    res.status(500).send(popup(`<p style="color:red">Erreur serveur : ${err.message}</p>`));
   }
 };
+
+function githubTokenExchange(https, clientId, clientSecret, code) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({ client_id: clientId, client_secret: clientSecret, code });
+    const options = {
+      hostname: 'github.com',
+      path: '/login/oauth/access_token',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': Buffer.byteLength(body)
+      }
+    };
+    const req = https.request(options, (r) => {
+      let raw = '';
+      r.on('data', chunk => raw += chunk);
+      r.on('end', () => { try { resolve(JSON.parse(raw)); } catch(e) { reject(e); } });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+function popup(content) {
+  return `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px">${content}</body></html>`;
+}

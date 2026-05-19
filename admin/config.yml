@@ -2,8 +2,8 @@ backend:
   name: github
   repo: PaulBrochot/portfolio-artiste
   branch: main
-  auth_type: pkce
-  app_id: Ov23li8n4LunXJWNZQLl
+  base_url: https://portfolio-artiste-blond.vercel.app
+  auth_endpoint: api/auth
 
 media_folder: images
 public_folder: /images
