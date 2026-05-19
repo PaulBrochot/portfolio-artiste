@@ -6,6 +6,23 @@
   <title>Admin — Mahé Barbry</title>
 </head>
 <body>
+  <script>
+    // Poll localStorage for token when window.opener is unavailable (COOP issue)
+    var _authPoll = setInterval(function() {
+      var stored = localStorage.getItem('decap_token');
+      if (!stored) return;
+      try {
+        var data = JSON.parse(stored);
+        if (Date.now() - data.ts > 60000) { localStorage.removeItem('decap_token'); return; }
+        localStorage.removeItem('decap_token');
+        clearInterval(_authPoll);
+        window.dispatchEvent(new MessageEvent('message', {
+          data: 'authorization:github:success:' + JSON.stringify({ token: data.token, provider: 'github' }),
+          origin: window.location.origin
+        }));
+      } catch(e) {}
+    }, 500);
+  </script>
   <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
 </body>
 </html>

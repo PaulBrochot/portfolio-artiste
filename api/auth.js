@@ -39,7 +39,8 @@ module.exports = async function handler(req, res) {
       `));
     }
 
-    // Send token to Decap CMS via postMessage
+    // Always write to localStorage (window.opener is nulled by GitHub's COOP headers)
+    // The admin page polls localStorage and dispatches the message event to Decap
     res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
     res.setHeader('Content-Type', 'text/html');
     res.send(popup(`
@@ -48,20 +49,11 @@ module.exports = async function handler(req, res) {
       (function() {
         var token = ${JSON.stringify(tokenData.access_token)};
         var msg = 'authorization:github:success:' + JSON.stringify({ token: token, provider: 'github' });
-        var sent = false;
-        function trySend() {
-          if (window.opener) {
-            window.opener.postMessage(msg, '*');
-            sent = true;
-            setTimeout(function() { window.close(); }, 800);
-          }
-        }
-        trySend();
-        if (!sent) {
-          // Fallback: store in localStorage for the parent to pick up
-          try { localStorage.setItem('decap_token', JSON.stringify({ token: token, ts: Date.now() })); } catch(e) {}
-          setTimeout(function() { window.close(); }, 1500);
-        }
+        // Store in localStorage — admin page polls for this
+        try { localStorage.setItem('decap_token', JSON.stringify({ token: token, ts: Date.now() })); } catch(e) {}
+        // Also try postMessage in case opener is available
+        if (window.opener) { try { window.opener.postMessage(msg, '*'); } catch(e) {} }
+        setTimeout(function() { window.close(); }, 800);
       })();
       </script>
     `));
