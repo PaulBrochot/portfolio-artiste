@@ -33,22 +33,14 @@
   </div>
 
   <!-- ── HERO ── -->
-  <section class="about-hero page-top">
+  <section class="about-hero page-top" id="aboutHero">
     <div class="about-hero__image">
-      <!-- ↓ Remplacer par portrait ou photo d'atelier -->
-      <img
-        src="images/portrait.jpg"
-        alt="Mahé Barbry"
-        loading="eager"
-      >
+      <img id="aboutPortrait" src="images/portrait.jpg" alt="Mahé Barbry" loading="eager">
     </div>
     <div class="about-hero__content">
       <p class="label">L'artiste</p>
-      <h1 class="about-hero__name">Prénom<br>Nom</h1>
-      <p class="about-hero__intro">
-        Né(e) en Castres. Vit et travaille à Agen.
-        Une pratique centrée sur la peinture — la matière, le geste, le temps.
-      </p>
+      <h1 class="about-hero__name" id="aboutName">Mahé Barbry</h1>
+      <p class="about-hero__intro" id="aboutBio">Vit et travaille à Agen.</p>
     </div>
   </section>
 
@@ -57,65 +49,43 @@
     <div>
       <p class="label">Démarche</p>
     </div>
-    <div class="about-body">
-
-      <p class="pull">
-        Je peins ce que l'on ne peut pas nommer. Ces états de présence
-        à la limite du visible — quand la lumière hésite, quand la matière
-        cède avant de tenir.
-      </p>
-
-      <p>
-        Mon travail prend racine dans l'observation minutieuse du monde physique —
-        la géologie, la lumière rasante, les surfaces usées par le temps.
-        Mais ce n'est jamais une représentation fidèle. C'est une mémoire :
-        ce que la sensation laisse après avoir traversé le corps.
-      </p>
-
-      <p>
-        Je travaille à l'huile, à l'acrylique, parfois en technique mixte.
-        La toile de lin, le panneau de bois, le papier marouflé — chaque support
-        impose sa logique, sa résistance, son rythme. Je ne choisis pas un support
-        par habitude, mais pour ce qu'il permet ou interdit.
-      </p>
-
-      <p>
-        Le geste est lent. Les couches s'accumulent, disparaissent, réapparaissent.
-        Une œuvre peut durer plusieurs mois avant de trouver son équilibre.
-        Il n'y a pas d'esquisse préalable — la composition se découvre dans le faire.
-      </p>
-
-      <p>
-        Ce qui m'intéresse, c'est cette zone incertaine entre l'abstraction et la trace
-        du réel : là où l'on reconnaît quelque chose sans pouvoir le nommer exactement.
-        Une surface noire qui devient profondeur. Une lumière qui tremble
-        sans jamais tout à fait se révéler.
-      </p>
-
-      <p class="pull" style="margin-top: 16px;">
-        « Peindre, c'est rester dans l'incertitude assez longtemps pour
-        que quelque chose de juste apparaisse. »
-      </p>
-
+    <div class="about-body" id="aboutApproach">
+      <p>Chargement…</p>
     </div>
   </section>
 
-  <!-- ── EXPOSITIONS (optionnel) ── -->
-  <section class="about-content" style="padding-top: 0; border-top: none;">
+  <!-- ── EXPOSITIONS ── -->
+  <section class="about-content" style="padding-top: 0; border-top: none;" id="exhibSection">
     <div>
       <p class="label">Expositions</p>
     </div>
-    <div class="about-body">
-      <p>
-        — [Titre de l'exposition], [Galerie / Lieu], [Ville], [Année]<br>
-        — [Titre de l'exposition], [Galerie / Lieu], [Ville], [Année]<br>
-        — [Titre de l'exposition], [Galerie / Lieu], [Ville], [Année]
-      </p>
-      <p style="margin-top: 8px;">
-        <a href="contact.html" class="link-arrow">Me contacter pour d'autres informations</a>
-      </p>
+    <div class="about-body" id="aboutExhibitions">
+      <p>Chargement…</p>
     </div>
   </section>
+
+  <script type="module">
+    import { getAbout } from './js/content.js';
+    const d = await getAbout();
+    document.getElementById('aboutName').textContent = d.name;
+    document.getElementById('aboutBio').textContent = d.bio_short;
+    if (d.portrait) document.getElementById('aboutPortrait').src = d.portrait;
+
+    const approachEl = document.getElementById('aboutApproach');
+    approachEl.innerHTML = d.approach.split('\n\n').filter(Boolean)
+      .map(p => `<p>${p}</p>`).join('');
+    if (d.quote) {
+      approachEl.innerHTML += `<p class="pull" style="margin-top:16px;">« ${d.quote} »</p>`;
+    }
+
+    const exhibEl = document.getElementById('aboutExhibitions');
+    if (d.exhibitions && d.exhibitions.length && d.exhibitions[0] !== 'À compléter') {
+      exhibEl.innerHTML = '<p>' + d.exhibitions.map(e => `— ${e}`).join('<br>') + '</p>';
+    } else {
+      exhibEl.innerHTML = '<p style="color:var(--sand);">À venir.</p>';
+    }
+    exhibEl.innerHTML += `<p style="margin-top:8px;"><a href="contact.html" class="link-arrow">Me contacter pour d'autres informations</a></p>`;
+  </script>
 
   <!-- ── FOOTER ── -->
   <footer class="footer">
@@ -126,7 +96,7 @@
         <a href="a-propos.html">À propos</a>
         <a href="contact.html">Contact</a>
       </nav>
-      <span class="footer__copy">© 2024 Mahé Barbry</span>
+      <span class="footer__copy">© 2025 Mahé Barbry · <a href="/admin/" style="opacity:.4;font-size:.85em;">Admin</a></span>
     </div>
   </footer>
 

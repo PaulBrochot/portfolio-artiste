@@ -1,0 +1,66 @@
+backend:
+  name: github
+  repo: PaulBrochot/portfolio-artiste
+  branch: main
+  base_url: https://portfolio-artiste-blond.vercel.app
+  auth_endpoint: api/auth
+
+media_folder: images
+public_folder: /images
+
+locale: fr
+
+collections:
+  - name: pages
+    label: "Contenu du site"
+    files:
+
+      - name: artworks
+        label: "Œuvres"
+        file: content/artworks.json
+        format: json
+        fields:
+          - name: artworks
+            label: "Liste des œuvres"
+            label_singular: "Œuvre"
+            widget: list
+            summary: "{{fields.title}} — {{fields.year}}"
+            fields:
+              - { label: "ID (ne pas modifier)", name: id, widget: string }
+              - { label: "Titre", name: title, widget: string }
+              - { label: "Année", name: year, widget: string }
+              - { label: "Technique", name: medium, widget: string }
+              - { label: "Dimensions", name: dimensions, widget: string }
+              - label: "Statut"
+                name: status
+                widget: select
+                options: ["Disponible", "Vendu", "Collection privée"]
+              - { label: "Image", name: image, widget: image }
+              - { label: "Description", name: description, widget: text }
+
+      - name: about
+        label: "À propos"
+        file: content/about.json
+        format: json
+        fields:
+          - { label: "Nom de l'artiste", name: name, widget: string }
+          - { label: "Courte bio (sous le nom)", name: bio_short, widget: string }
+          - { label: "Phrase d'intro (hero)", name: intro, widget: text }
+          - { label: "Citation (section démarche)", name: quote, widget: string }
+          - { label: "Texte démarche", name: approach, widget: text }
+          - { label: "Photo portrait", name: portrait, widget: image }
+          - name: exhibitions
+            label: "Expositions"
+            widget: list
+            field: { label: "Ligne", name: item, widget: string }
+
+      - name: contact
+        label: "Contact"
+        file: content/contact.json
+        format: json
+        fields:
+          - { label: "Email", name: email, widget: string }
+          - { label: "Instagram (ex: @mahe.barbry)", name: instagram, widget: string }
+          - { label: "Lien Instagram", name: instagram_url, widget: string }
+          - { label: "Ville / Adresse", name: address, widget: string }
+          - { label: "Message d'accueil", name: message, widget: text }

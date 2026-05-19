@@ -60,57 +60,12 @@
       <a href="galerie.html" class="link-arrow">Voir toutes les œuvres</a>
     </div>
 
-    <div class="home-works__grid">
+    <div class="home-works__grid" id="homeGrid"></div>
 
-      <!-- Vedette (span 2 colonnes) -->
-      <a href="oeuvres/oeuvre-1.html" class="work-item">
-        <div class="work-item__img-wrap">
-          <img src="images/gloire-paillettes.jpg" alt="Gloire &amp; Paillettes" loading="lazy">
-        </div>
-        <div class="work-item__info">
-          <span class="work-item__title">Gloire &amp; Paillettes</span>
-          <span class="work-item__year">2024</span>
-        </div>
-        <p class="work-item__sub">Acrylique et paillettes sur toile — 130 × 100 cm</p>
-      </a>
-
-      <!-- Œuvre 2 -->
-      <a href="oeuvres/oeuvre-3.html" class="work-item">
-        <div class="work-item__img-wrap">
-          <img src="images/la-ville-qui-crie.jpg" alt="La Ville Qui Crie" loading="lazy">
-        </div>
-        <div class="work-item__info">
-          <span class="work-item__title">La Ville Qui Crie</span>
-          <span class="work-item__year">2023</span>
-        </div>
-        <p class="work-item__sub">Acrylique sur toile — 130 × 90 cm</p>
-      </a>
-
-      <!-- Œuvre 3 -->
-      <a href="oeuvres/oeuvre-4.html" class="work-item">
-        <div class="work-item__img-wrap">
-          <img src="images/de-la-democratie.jpg" alt="De la Démocratie" loading="lazy">
-        </div>
-        <div class="work-item__info">
-          <span class="work-item__title">De la Démocratie</span>
-          <span class="work-item__year">2025</span>
-        </div>
-        <p class="work-item__sub">Technique mixte sur toile — 90 × 120 cm</p>
-      </a>
-
-      <!-- Œuvre 4 -->
-      <a href="oeuvres/oeuvre-5.html" class="work-item">
-        <div class="work-item__img-wrap">
-          <img src="images/etoile-rouge.jpg" alt="Étoile Rouge" loading="lazy">
-        </div>
-        <div class="work-item__info">
-          <span class="work-item__title">Étoile Rouge</span>
-          <span class="work-item__year">2024</span>
-        </div>
-        <p class="work-item__sub">Acrylique sur carton — 40 × 60 cm</p>
-      </a>
-
-    </div>
+    <script type="module">
+      import { getArtworks, renderHomeGrid } from './js/content.js';
+      renderHomeGrid(await getArtworks(), document.getElementById('homeGrid'));
+    </script>
   </section>
 
   <!-- ── DÉMARCHE ── -->
@@ -149,7 +104,7 @@
         <a href="a-propos.html">À propos</a>
         <a href="contact.html">Contact</a>
       </nav>
-      <span class="footer__copy">© 2025 Mahé Barbry</span>
+      <span class="footer__copy">© 2025 Mahé Barbry · <a href="/admin/" style="opacity:.4;font-size:.85em;">Admin</a></span>
     </div>
   </footer>
 

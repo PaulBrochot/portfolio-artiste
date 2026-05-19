@@ -1,0 +1,54 @@
+{
+  "artworks": [
+    {
+      "id": "1",
+      "title": "Gloire & Paillettes",
+      "year": "2024",
+      "medium": "Acrylique et paillettes sur toile",
+      "dimensions": "130 × 100 cm",
+      "status": "Disponible",
+      "image": "/images/gloire-paillettes.jpg",
+      "description": "Une figure triomphante baignée dans la gloire de la couleur — du rouge, du doré, et ces paillettes qui transforment chaque regard en lumière. Le personnage célèbre quelque chose, mais on ne sait pas quoi. Peut-être simplement d'exister."
+    },
+    {
+      "id": "2",
+      "title": "Original Vulture",
+      "year": "2024",
+      "medium": "Acrylique sur toile",
+      "dimensions": "100 × 130 cm",
+      "status": "Disponible",
+      "image": "/images/original-vulture.jpg",
+      "description": "Le vautour comme figure totem — oiseau de charnier, mais aussi gardien. Sa présence est ambivalente : il annonce la fin et en même temps, il nettoie. Peint dans une palette froide, tranchante, le vautour original est celui qui reste quand les autres sont partis."
+    },
+    {
+      "id": "3",
+      "title": "La Ville Qui Crie",
+      "year": "2023",
+      "medium": "Acrylique sur toile",
+      "dimensions": "130 × 90 cm",
+      "status": "Collection privée",
+      "image": "/images/la-ville-qui-crie.jpg",
+      "description": "La ville n'est pas un décor — c'est un personnage. Elle crie, elle pousse, elle déborde de ses propres contours. Les bâtiments sont des visages, les rues sont des bouches. La ville qui crie est celle qu'on entend sans jamais vraiment écouter."
+    },
+    {
+      "id": "4",
+      "title": "De la Démocratie",
+      "year": "2025",
+      "medium": "Acrylique, collage, spray sur toile",
+      "dimensions": "90 × 120 cm",
+      "status": "Disponible",
+      "image": "/images/de-la-democratie.jpg",
+      "description": "Journaux collés, tags au spray, signes monétaires et graffitis qui se superposent dans un chaos construit. Les fragments de texte — « de la démocr… » — sont à moitié effacés, à moitié illisibles. Qu'est-ce qui reste visible dans le débat public ? Cette toile est une archive de la rue, dense et contradictoire — le bruit du monde distillé en image."
+    },
+    {
+      "id": "5",
+      "title": "Étoile Rouge",
+      "year": "2024",
+      "medium": "Acrylique sur carton",
+      "dimensions": "40 × 60 cm",
+      "status": "Disponible",
+      "image": "/images/etoile-rouge.jpg",
+      "description": "Le personnage le plus direct — une figure frontale qui regarde, une étoile rouge plantée dans l'œil. L'œil-étoile : la marque, le logo, le signe distinctif. La bouche grande ouverte, les dents multicolores comme un clavier. On parle, on crie, on chante. Le personnage à l'étoile rouge est à la fois masque et miroir."
+    }
+  ]
+}

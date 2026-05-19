@@ -3,109 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Original Vulture — Mahé Barbry</title>
-  <meta name="description" content="Original Vulture, 2024. Acrylique sur toile, 100 × 130 cm. Œuvre de Mahé Barbry.">
+  <title>Œuvre — Mahé Barbry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
-
+<body data-artwork-id="2">
   <nav class="nav nav--solid" id="nav">
     <div class="nav__inner">
       <a href="../index.html" class="nav__name">Mahé Barbry</a>
       <ul class="nav__links">
-        <li><a href="../galerie.html"  class="nav__link nav__link--active">Œuvres</a></li>
+        <li><a href="../galerie.html" class="nav__link nav__link--active">Œuvres</a></li>
         <li><a href="../a-propos.html" class="nav__link">À propos</a></li>
-        <li><a href="../contact.html"  class="nav__link">Contact</a></li>
+        <li><a href="../contact.html" class="nav__link">Contact</a></li>
       </ul>
       <button class="nav__toggle" id="navToggle" aria-label="Menu">Menu</button>
     </div>
   </nav>
   <div class="nav-overlay" id="navOverlay">
     <button class="nav-overlay__close" id="navClose">Fermer</button>
-    <a href="../galerie.html"  class="nav-overlay__link">Œuvres</a>
+    <a href="../galerie.html" class="nav-overlay__link">Œuvres</a>
     <a href="../a-propos.html" class="nav-overlay__link">À propos</a>
-    <a href="../contact.html"  class="nav-overlay__link">Contact</a>
+    <a href="../contact.html" class="nav-overlay__link">Contact</a>
   </div>
 
   <div class="artwork-hero page-top">
-    <img src="../images/original-vulture.jpg" alt="Original Vulture — Mahé Barbry" loading="eager">
+    <img id="artworkImg" src="" alt="" loading="eager">
   </div>
-
-  <div class="artwork-body">
-    <div class="artwork-header">
-      <p class="label">Mahé Barbry</p>
-      <h1 class="artwork-title">Original Vulture</h1>
-      <span class="artwork-status artwork-status--available">Disponible</span>
-    </div>
-    <div class="artwork-columns">
-      <div>
-        <p class="artwork-note">
-          Le visage-emblème construit comme un manifeste. « Culture Culture Culture »
-          écrit dans le coin gauche, « MAMA » au centre, une bouche garnie d'or massif.
-          Chaque symbole, chaque couleur est une revendication — d'identité, de mémoire,
-          d'appartenance. La tête-machine qui digère et réinvente le monde qui lui est
-          imposé. Original et vautour à la fois.
-        </p>
-      </div>
-      <div class="artwork-meta">
-        <div class="artwork-meta__item">
-          <span class="artwork-meta__key">Année</span>
-          <span class="artwork-meta__value">2024</span>
-        </div>
-        <div class="artwork-meta__item">
-          <span class="artwork-meta__key">Technique</span>
-          <span class="artwork-meta__value">Acrylique sur toile</span>
-        </div>
-        <div class="artwork-meta__item">
-          <span class="artwork-meta__key">Dimensions</span>
-          <span class="artwork-meta__value">100 × 130 cm</span>
-        </div>
-        <div class="artwork-meta__item">
-          <span class="artwork-meta__key">Statut</span>
-          <span class="artwork-meta__value">Disponible</span>
-        </div>
-      </div>
-    </div>
-    <div class="artwork-nav">
-      <a href="oeuvre-1.html" class="artwork-nav__item">
-        <span class="artwork-nav__label">Précédente</span>
-        <span class="artwork-nav__title">← Gloire &amp; Paillettes</span>
-      </a>
-      <div class="artwork-nav__center">
-        <a href="../galerie.html">Toutes les œuvres</a>
-      </div>
-      <a href="oeuvre-3.html" class="artwork-nav__item artwork-nav__item--next">
-        <span class="artwork-nav__label">Suivante</span>
-        <span class="artwork-nav__title">La Ville Qui Crie →</span>
-      </a>
-    </div>
-  </div>
+  <div class="artwork-body" id="artworkBody"></div>
 
   <div class="interest-block">
     <div class="interest-block__inner">
       <span class="label">Renseignements</span>
       <h2 class="interest-block__title">Je suis intéressé<br>par cette œuvre</h2>
-      <p class="interest-block__sub">
-        Pour toute demande d'information ou d'acquisition, envoyez un message.
-        Mahé Barbry répondra dans les meilleurs délais.
-      </p>
+      <p class="interest-block__sub">Pour toute demande d'information ou d'acquisition, envoyez un message. Mahé Barbry répondra dans les meilleurs délais.</p>
       <form class="interest-block__form" action="#" method="post">
-        <input type="hidden" name="oeuvre" value="Original Vulture — 2024 — Acrylique sur toile — 100 × 130 cm">
+        <input type="hidden" name="oeuvre" id="hiddenOeuvre">
         <div class="form-group">
-          <label class="form-label" for="i2-name">Votre nom</label>
-          <input class="form-input" type="text" id="i2-name" name="name" placeholder="Votre nom" required>
+          <label class="form-label" for="i-name">Votre nom</label>
+          <input class="form-input" type="text" id="i-name" name="name" placeholder="Votre nom" required>
         </div>
         <div class="form-group">
-          <label class="form-label" for="i2-email">Adresse email</label>
-          <input class="form-input" type="email" id="i2-email" name="email" placeholder="votre@email.com" required>
+          <label class="form-label" for="i-email">Adresse email</label>
+          <input class="form-input" type="email" id="i-email" name="email" placeholder="votre@email.com" required>
         </div>
         <div class="form-group">
-          <label class="form-label" for="i2-msg">Message</label>
-          <textarea class="form-textarea" id="i2-msg" name="message" rows="4"
-            placeholder="Je souhaiterais en savoir plus sur cette œuvre…"></textarea>
+          <label class="form-label" for="i-msg">Message</label>
+          <textarea class="form-textarea" id="i-msg" name="message" rows="4" placeholder="Je souhaiterais en savoir plus sur cette œuvre…"></textarea>
         </div>
         <button type="submit" class="btn">Envoyer ma demande</button>
       </form>
@@ -120,9 +65,23 @@
         <a href="../a-propos.html">À propos</a>
         <a href="../contact.html">Contact</a>
       </nav>
-      <span class="footer__copy">© 2025 Mahé Barbry</span>
+      <span class="footer__copy">© 2025 Mahé Barbry · <a href="/admin/" style="opacity:.4;font-size:.85em;">Admin</a></span>
     </div>
   </footer>
+
+  <script type="module">
+    import { getArtworks, renderArtwork } from '../js/content.js';
+    const id = document.body.dataset.artworkId;
+    const artworks = await getArtworks();
+    const artwork = artworks.find(a => a.id === id);
+    if (artwork) {
+      document.title = `${artwork.title} — Mahé Barbry`;
+      document.getElementById('artworkImg').src = artwork.image;
+      document.getElementById('artworkImg').alt = `${artwork.title} — Mahé Barbry`;
+      document.getElementById('hiddenOeuvre').value = `${artwork.title} — ${artwork.year} — ${artwork.medium} — ${artwork.dimensions}`;
+      renderArtwork(artwork, artworks, document.getElementById('artworkBody'));
+    }
+  </script>
   <script src="../js/main.js"></script>
 </body>
 </html>
