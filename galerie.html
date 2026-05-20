@@ -44,11 +44,16 @@
 
   <script type="module">
     import { getArtworks, renderGalleryGrid } from './js/content.js';
-    const artworks = await getArtworks();
-    const years = artworks.map(a => a.year).sort();
-    document.getElementById('galleryCount').textContent =
-      `${artworks.length} œuvre${artworks.length > 1 ? 's' : ''} · ${years[0]} – ${years[years.length - 1]}`;
-    renderGalleryGrid(artworks, document.getElementById('galleryGrid'));
+    try {
+      const artworks = await getArtworks();
+      const years = artworks.map(a => a.year).sort();
+      document.getElementById('galleryCount').textContent =
+        `${artworks.length} œuvre${artworks.length > 1 ? 's' : ''} · ${years[0]} – ${years[years.length - 1]}`;
+      renderGalleryGrid(artworks, document.getElementById('galleryGrid'));
+    } catch(e) {
+      document.getElementById('galleryCount').textContent = 'Erreur : ' + e.message;
+      console.error('getArtworks error:', e);
+    }
   </script>
 
   <footer class="footer">
