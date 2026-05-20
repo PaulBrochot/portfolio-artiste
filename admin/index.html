@@ -240,6 +240,10 @@
     </div>
     <p class="error-msg" id="loginError"></p>
     <button class="btn" id="loginBtn" style="width:100%;margin-top:8px">Se connecter</button>
+    <p style="text-align:center;margin-top:14px">
+      <button id="forgotBtn" style="background:none;border:none;color:#888;font-size:12px;cursor:pointer;text-decoration:underline">Mot de passe oublié ?</button>
+    </p>
+    <p id="resetMsg" style="display:none;font-size:12px;color:#2e7d32;margin-top:8px;text-align:center"></p>
   </div>
 </div>
 
@@ -466,6 +470,20 @@
   })
 
   $('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click() })
+
+  $('forgotBtn').addEventListener('click', async () => {
+    const email = $('loginEmail').value.trim()
+    if (!email) { $('loginError').textContent = 'Entre ton email ci-dessus d\'abord.'; return }
+    $('forgotBtn').disabled = true
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/admin/reset.html'
+    })
+    $('forgotBtn').disabled = false
+    if (error) { $('loginError').textContent = 'Erreur : ' + error.message; return }
+    $('loginError').textContent = ''
+    $('resetMsg').style.display = 'block'
+    $('resetMsg').textContent = 'Email envoyé ! Vérifie ta boîte mail.'
+  })
 
   $('logoutBtn').addEventListener('click', () => supabase.auth.signOut())
 

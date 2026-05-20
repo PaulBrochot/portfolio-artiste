@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveau mot de passe — Mahé Barbry</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      background: #f4f4f1;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .box {
+      background: #fff;
+      border: 1px solid #e0e0da;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+    }
+    h1 { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+    .sub { color: #888; font-size: 13px; margin-bottom: 28px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: #555; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 9px 12px; border: 1px solid #d8d8d2; font-size: 14px; font-family: inherit; outline: none; }
+    .field input:focus { border-color: #1a1a1a; }
+    .btn { width: 100%; padding: 10px; background: #1a1a1a; color: #fff; border: none; font-size: 14px; font-family: inherit; cursor: pointer; margin-top: 8px; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .error { color: #c62828; font-size: 12px; margin-top: 8px; }
+    .success { color: #2e7d32; font-size: 13px; margin-top: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Nouveau mot de passe</h1>
+    <p class="sub">Mahé Barbry — Administration</p>
+
+    <div id="formWrap">
+      <div class="field">
+        <label for="pwd">Nouveau mot de passe</label>
+        <input type="password" id="pwd" placeholder="8 caractères minimum" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="pwd2">Confirmer le mot de passe</label>
+        <input type="password" id="pwd2" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <p class="error" id="err"></p>
+      <button class="btn" id="saveBtn">Enregistrer le mot de passe</button>
+    </div>
+
+    <p class="success" id="ok" style="display:none">
+      Mot de passe enregistré !<br>
+      <a href="./index.html" style="color:#1a1a1a">→ Aller à l'administration</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+    const supabase = createClient(
+      'https://yybnufouzafwmejegbni.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Ym51Zm91emFmd21lamVnYm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODQyNDcsImV4cCI6MjA5NDg2MDI0N30.GpkMY1iZ98PpHtx3_Td-rGbMz_ph4QVdpdodJ6S5m9c'
+    )
+
+    // Supabase place le token dans le hash quand on arrive depuis un lien email
+    const { data: { session }, error: sessionErr } = await supabase.auth.getSession()
+
+    if (!session) {
+      document.getElementById('err').textContent = 'Lien invalide ou expiré. Demande un nouvel email de réinitialisation.'
+      document.getElementById('saveBtn').disabled = true
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const pwd = document.getElementById('pwd').value
+      const pwd2 = document.getElementById('pwd2').value
+      const err = document.getElementById('err')
+      err.textContent = ''
+
+      if (pwd.length < 8) { err.textContent = 'Le mot de passe doit faire au moins 8 caractères.'; return }
+      if (pwd !== pwd2) { err.textContent = 'Les mots de passe ne correspondent pas.'; return }
+
+      document.getElementById('saveBtn').disabled = true
+      document.getElementById('saveBtn').textContent = 'Enregistrement…'
+
+      const { error } = await supabase.auth.updateUser({ password: pwd })
+
+      if (error) {
+        err.textContent = 'Erreur : ' + error.message
+        document.getElementById('saveBtn').disabled = false
+        document.getElementById('saveBtn').textContent = 'Enregistrer le mot de passe'
+        return
+      }
+
+      document.getElementById('formWrap').style.display = 'none'
+      document.getElementById('ok').style.display = 'block'
+    })
+  </script>
+</body>
+</html>
