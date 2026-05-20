@@ -1,31 +1,743 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Mahé Barbry</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      background: #f4f4f1;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN ── */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-box {
+      background: #fff;
+      border: 1px solid #e0e0da;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .login-box h1 { font-size: 20px; font-weight: 500; letter-spacing: .02em; }
+    .login-box .sub { color: #888; font-size: 13px; margin-top: 4px; margin-bottom: 28px; }
+
+    /* ── HEADER ── */
+    .header {
+      background: #1a1a1a;
+      color: #fff;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 24px;
+    }
+    .header__title { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; flex: 1; }
+    .header__link { color: #aaa; font-size: 12px; text-decoration: none; }
+    .header__link:hover { color: #fff; }
+
+    /* ── TABS ── */
+    .tabs {
+      background: #fff;
+      border-bottom: 1px solid #e0e0da;
+      display: flex;
+      padding: 0 24px;
+    }
+    .tab {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+      transition: color .15s, border-color .15s;
+    }
+    .tab:hover { color: #1a1a1a; }
+    .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 500; }
+
+    /* ── CONTAINER ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-header h2 { font-size: 18px; font-weight: 500; }
+
+    /* ── ARTWORK LIST ── */
+    .artwork-card {
+      background: #fff;
+      border: 1px solid #e0e0da;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+    .artwork-card__img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #f0f0ec;
+    }
+    .artwork-card__info { flex: 1; min-width: 0; }
+    .artwork-card__title { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .artwork-card__meta { font-size: 12px; color: #888; margin-top: 2px; }
+    .artwork-card__status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .status--available { background: #e8f5e9; color: #2e7d32; }
+    .status--sold { background: #fce4ec; color: #c62828; }
+    .status--private { background: #f3e5f5; color: #6a1b9a; }
+    .artwork-card__actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── FORMS ── */
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: #555; margin-bottom: 6px; }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #d8d8d2;
+      background: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: #1a1a1a; }
+    .field textarea { resize: vertical; min-height: 100px; }
+    .field select { cursor: pointer; }
+
+    .form-card {
+      background: #fff;
+      border: 1px solid #e0e0da;
+      padding: 28px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ── IMAGE UPLOAD ── */
+    .img-upload-area {
+      border: 2px dashed #d8d8d2;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .img-upload-area:hover { border-color: #1a1a1a; }
+    .img-upload-area input { display: none; }
+    .img-upload-area p { font-size: 13px; color: #888; margin-top: 8px; }
+    .img-preview { width: 100%; max-height: 200px; object-fit: contain; margin-bottom: 8px; display: none; }
+    .img-current { width: 80px; height: 80px; object-fit: cover; display: block; margin: 0 auto 8px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border: 1px solid #1a1a1a;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+    .btn:hover { background: #333; }
+    .btn--ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.3); }
+    .btn--ghost:hover { background: rgba(255,255,255,.1); }
+    .btn--outline { background: transparent; color: #1a1a1a; }
+    .btn--outline:hover { background: #1a1a1a; color: #fff; }
+    .btn--danger { background: #c62828; border-color: #c62828; }
+    .btn--danger:hover { background: #b71c1c; }
+    .btn--sm { padding: 6px 12px; font-size: 12px; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── MODAL ── */
+    .modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+    .modal__backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); }
+    .modal__box {
+      position: relative;
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      z-index: 1;
+    }
+    .modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e0e0da;
+    }
+    .modal__header h3 { font-size: 16px; font-weight: 500; }
+    .modal__close { background: none; border: none; cursor: pointer; font-size: 18px; color: #888; line-height: 1; padding: 4px; }
+    .modal__close:hover { color: #1a1a1a; }
+    .modal__body { padding: 24px; }
+    .modal__footer { padding: 16px 24px; border-top: 1px solid #e0e0da; display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      font-size: 13px;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast--ok { background: #1a1a1a; color: #fff; }
+    .toast--err { background: #c62828; color: #fff; }
+
+    /* ── ERROR ── */
+    .error-msg { color: #c62828; font-size: 12px; margin-top: 6px; }
+
+    /* ── EMPTY ── */
+    .empty { padding: 40px; text-align: center; color: #888; background: #fff; border: 1px solid #e0e0da; }
+
+    /* ── SORT HINT ── */
+    .sort-hint { font-size: 12px; color: #888; margin-bottom: 12px; }
+  </style>
 </head>
 <body>
-  <script>
-    // Poll localStorage for token (popup can't use postMessage due to GitHub's COOP headers)
-    var _authPoll = setInterval(function() {
-      var stored = localStorage.getItem('decap_token');
-      if (!stored) return;
-      try {
-        var data = JSON.parse(stored);
-        if (Date.now() - data.ts > 60000) { localStorage.removeItem('decap_token'); return; }
-        localStorage.removeItem('decap_token');
-        clearInterval(_authPoll);
-        // Signal popup it can close
-        localStorage.setItem('decap_token_received', '1');
-        // Dispatch the auth message to Decap while popup is still open
-        window.dispatchEvent(new MessageEvent('message', {
-          data: 'authorization:github:success:' + JSON.stringify({ token: data.token, provider: 'github' }),
-          origin: window.location.origin
-        }));
-      } catch(e) {}
-    }, 200);
-  </script>
-  <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
+
+<!-- LOGIN -->
+<div id="screen-login" class="login-wrap">
+  <div class="login-box">
+    <h1>Administration</h1>
+    <p class="sub">Mahé Barbry</p>
+    <div class="field">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" placeholder="email@exemple.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label for="loginPassword">Mot de passe</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <p class="error-msg" id="loginError"></p>
+    <button class="btn" id="loginBtn" style="width:100%;margin-top:8px">Se connecter</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin" style="display:none">
+  <header class="header">
+    <span class="header__title">Admin — Mahé Barbry</span>
+    <a href="../index.html" class="header__link" target="_blank">Voir le site →</a>
+    <button class="btn btn--ghost btn--sm" id="logoutBtn">Déconnexion</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="artworks">Œuvres</button>
+    <button class="tab" data-tab="about">À propos</button>
+    <button class="tab" data-tab="contact">Contact</button>
+  </nav>
+
+  <div class="container">
+
+    <!-- TAB: OEUVRES -->
+    <div id="tab-artworks">
+      <div class="section-header">
+        <h2>Œuvres</h2>
+        <button class="btn" id="addArtworkBtn">+ Ajouter une œuvre</button>
+      </div>
+      <p class="sort-hint">Les œuvres sont affichées dans l'ordre du champ "Ordre". Plus le chiffre est petit, plus l'œuvre apparaît en premier.</p>
+      <div id="artworksList"></div>
+    </div>
+
+    <!-- TAB: À PROPOS -->
+    <div id="tab-about" style="display:none">
+      <div class="section-header"><h2>À propos</h2></div>
+      <div class="form-card">
+        <div class="form-row">
+          <div class="field">
+            <label>Nom de l'artiste</label>
+            <input type="text" id="aboutName">
+          </div>
+          <div class="field">
+            <label>Bio courte (sous le nom)</label>
+            <input type="text" id="aboutBioShort">
+          </div>
+        </div>
+        <div class="field">
+          <label>Phrase d'intro (page d'accueil)</label>
+          <input type="text" id="aboutIntro">
+        </div>
+        <div class="field">
+          <label>Citation (démarche)</label>
+          <input type="text" id="aboutQuote">
+        </div>
+        <div class="field">
+          <label>Texte démarche</label>
+          <textarea id="aboutApproach" rows="6"></textarea>
+        </div>
+        <div class="field">
+          <label>Expositions (une par ligne)</label>
+          <textarea id="aboutExhibitions" rows="4" placeholder="2024 — Galerie X, Paris&#10;2023 — Exposition Y, Lyon"></textarea>
+        </div>
+        <div class="field">
+          <label>Photo portrait</label>
+          <div class="img-upload-area" id="portraitUploadArea">
+            <img class="img-preview" id="portraitPreview">
+            <img class="img-current" id="portraitCurrent" src="" alt="" style="display:none">
+            <p id="portraitUploadText">Cliquer pour choisir une photo</p>
+            <input type="file" id="portraitFile" accept="image/*">
+          </div>
+        </div>
+        <button class="btn" id="saveAboutBtn">Enregistrer</button>
+      </div>
+    </div>
+
+    <!-- TAB: CONTACT -->
+    <div id="tab-contact" style="display:none">
+      <div class="section-header"><h2>Contact</h2></div>
+      <div class="form-card">
+        <div class="form-row">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="contactEmail">
+          </div>
+          <div class="field">
+            <label>Adresse / Ville</label>
+            <input type="text" id="contactAddress">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Instagram (ex: @mahe.barbry)</label>
+            <input type="text" id="contactInstagram">
+          </div>
+          <div class="field">
+            <label>Lien Instagram (URL complète)</label>
+            <input type="url" id="contactInstagramUrl">
+          </div>
+        </div>
+        <div class="field">
+          <label>Message d'accueil</label>
+          <textarea id="contactMessage" rows="3"></textarea>
+        </div>
+        <button class="btn" id="saveContactBtn">Enregistrer</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL OEUVRE -->
+<div id="artworkModal" style="display:none" class="modal">
+  <div class="modal__backdrop" id="modalBackdrop"></div>
+  <div class="modal__box">
+    <div class="modal__header">
+      <h3 id="modalTitle">Nouvelle œuvre</h3>
+      <button class="modal__close" id="modalClose">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-row">
+        <div class="field">
+          <label>Titre *</label>
+          <input type="text" id="fTitle" required>
+        </div>
+        <div class="field">
+          <label>Année</label>
+          <input type="text" id="fYear" placeholder="2025">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Technique</label>
+          <input type="text" id="fMedium" placeholder="Acrylique sur toile">
+        </div>
+        <div class="field">
+          <label>Dimensions</label>
+          <input type="text" id="fDimensions" placeholder="100 × 80 cm">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Statut</label>
+          <select id="fStatus">
+            <option value="Disponible">Disponible</option>
+            <option value="Vendu">Vendu</option>
+            <option value="Collection privée">Collection privée</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Ordre d'affichage</label>
+          <input type="number" id="fOrder" value="10" min="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="fDescription" rows="4"></textarea>
+      </div>
+      <div class="field">
+        <label>Image</label>
+        <div class="img-upload-area" id="artworkUploadArea">
+          <img class="img-preview" id="artworkImgPreview">
+          <p id="artworkUploadText">Cliquer pour choisir une image</p>
+          <input type="file" id="artworkFile" accept="image/*">
+        </div>
+        <p style="font-size:11px;color:#888;margin-top:4px">Laisser vide pour conserver l'image actuelle lors d'une modification.</p>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" id="modalCancelBtn">Annuler</button>
+      <button class="btn" id="modalSaveBtn">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+  const supabase = createClient(
+    'https://yybnufouzafwmejegbni.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Ym51Zm91emFmd21lamVnYm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODQyNDcsImV4cCI6MjA5NDg2MDI0N30.GpkMY1iZ98PpHtx3_Td-rGbMz_ph4QVdpdodJ6S5m9c'
+  )
+
+  const $ = id => document.getElementById(id)
+
+  // ── TOAST ──────────────────────────────────────────────────────────────────
+  function toast(msg, type = 'ok') {
+    const el = $('toast')
+    el.textContent = msg
+    el.className = `toast toast--${type} show`
+    setTimeout(() => el.classList.remove('show'), 3000)
+  }
+
+  // ── AUTH ────────────────────────────────────────────────────────────────────
+  function showLogin() {
+    $('screen-login').style.display = 'flex'
+    $('screen-admin').style.display = 'none'
+  }
+
+  async function showAdmin() {
+    $('screen-login').style.display = 'none'
+    $('screen-admin').style.display = 'block'
+    await loadArtworks()
+    await loadAbout()
+    await loadContact()
+  }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session) { await showAdmin() } else { showLogin() }
+
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN') await showAdmin()
+    if (event === 'SIGNED_OUT') showLogin()
+  })
+
+  $('loginBtn').addEventListener('click', async () => {
+    const email = $('loginEmail').value.trim()
+    const password = $('loginPassword').value
+    $('loginError').textContent = ''
+    $('loginBtn').disabled = true
+    $('loginBtn').textContent = 'Connexion…'
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    $('loginBtn').disabled = false
+    $('loginBtn').textContent = 'Se connecter'
+    if (error) $('loginError').textContent = 'Email ou mot de passe incorrect.'
+  })
+
+  $('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click() })
+
+  $('logoutBtn').addEventListener('click', () => supabase.auth.signOut())
+
+  // ── TABS ─────────────────────────────────────────────────────────────────────
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      const tab = btn.dataset.tab
+      ;['artworks', 'about', 'contact'].forEach(t => {
+        $('tab-' + t).style.display = t === tab ? 'block' : 'none'
+      })
+    })
+  })
+
+  // ── ARTWORKS ─────────────────────────────────────────────────────────────────
+  async function loadArtworks() {
+    const { data, error } = await supabase
+      .from('artworks')
+      .select('*')
+      .order('order_index', { ascending: true })
+    if (error) { toast('Erreur de chargement', 'err'); return }
+    renderArtworksList(data)
+  }
+
+  function statusLabel(status) {
+    if (status === 'Disponible') return `<span class="artwork-card__status status--available">Disponible</span>`
+    if (status === 'Vendu') return `<span class="artwork-card__status status--sold">Vendu</span>`
+    return `<span class="artwork-card__status status--private">Collection privée</span>`
+  }
+
+  function renderArtworksList(artworks) {
+    const container = $('artworksList')
+    if (!artworks.length) {
+      container.innerHTML = '<div class="empty">Aucune œuvre. Commencez par en ajouter une.</div>'
+      return
+    }
+    container.innerHTML = artworks.map(a => `
+      <div class="artwork-card" data-id="${a.id}">
+        <img class="artwork-card__img" src="${a.image_url || ''}" alt="${a.title}" onerror="this.src=''">
+        <div class="artwork-card__info">
+          <div class="artwork-card__title">${a.title}</div>
+          <div class="artwork-card__meta">${a.year || ''}${a.year && a.medium ? ' · ' : ''}${a.medium || ''} · Ordre : ${a.order_index}</div>
+        </div>
+        ${statusLabel(a.status)}
+        <div class="artwork-card__actions">
+          <button class="btn btn--outline btn--sm" onclick="editArtwork(${a.id})">Modifier</button>
+          <button class="btn btn--danger btn--sm" onclick="deleteArtwork(${a.id}, '${a.title.replace(/'/g, "\\'")}')">Supprimer</button>
+        </div>
+      </div>
+    `).join('')
+  }
+
+  // ── ARTWORK MODAL ──────────────────────────────────────────────────────────
+  let editingId = null
+  let pendingImageFile = null
+  let currentImageUrl = null
+
+  function openModal(artwork = null) {
+    editingId = artwork ? artwork.id : null
+    pendingImageFile = null
+    currentImageUrl = artwork ? artwork.image_url : null
+
+    $('modalTitle').textContent = artwork ? 'Modifier l\'œuvre' : 'Nouvelle œuvre'
+    $('fTitle').value = artwork?.title || ''
+    $('fYear').value = artwork?.year || ''
+    $('fMedium').value = artwork?.medium || ''
+    $('fDimensions').value = artwork?.dimensions || ''
+    $('fStatus').value = artwork?.status || 'Disponible'
+    $('fOrder').value = artwork?.order_index ?? 10
+    $('fDescription').value = artwork?.description || ''
+
+    // Image preview
+    const preview = $('artworkImgPreview')
+    const uploadText = $('artworkUploadText')
+    $('artworkFile').value = ''
+    if (artwork?.image_url) {
+      preview.src = artwork.image_url
+      preview.style.display = 'block'
+      uploadText.textContent = 'Cliquer pour changer l\'image'
+    } else {
+      preview.style.display = 'none'
+      uploadText.textContent = 'Cliquer pour choisir une image'
+    }
+
+    $('artworkModal').style.display = 'flex'
+    $('fTitle').focus()
+  }
+
+  function closeModal() {
+    $('artworkModal').style.display = 'none'
+    editingId = null
+    pendingImageFile = null
+  }
+
+  $('addArtworkBtn').addEventListener('click', () => openModal())
+  $('modalClose').addEventListener('click', closeModal)
+  $('modalCancelBtn').addEventListener('click', closeModal)
+  $('modalBackdrop').addEventListener('click', closeModal)
+
+  $('artworkUploadArea').addEventListener('click', () => $('artworkFile').click())
+  $('artworkFile').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    pendingImageFile = file
+    const preview = $('artworkImgPreview')
+    preview.src = URL.createObjectURL(file)
+    preview.style.display = 'block'
+    $('artworkUploadText').textContent = file.name
+  })
+
+  window.editArtwork = async function(id) {
+    const { data, error } = await supabase.from('artworks').select('*').eq('id', id).single()
+    if (error) { toast('Erreur', 'err'); return }
+    openModal(data)
+  }
+
+  window.deleteArtwork = async function(id, title) {
+    if (!confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return
+    const { error } = await supabase.from('artworks').delete().eq('id', id)
+    if (error) { toast('Erreur lors de la suppression', 'err'); return }
+    toast('Œuvre supprimée')
+    await loadArtworks()
+  }
+
+  $('modalSaveBtn').addEventListener('click', async () => {
+    const title = $('fTitle').value.trim()
+    if (!title) { $('fTitle').focus(); return }
+
+    $('modalSaveBtn').disabled = true
+    $('modalSaveBtn').textContent = 'Enregistrement…'
+
+    let image_url = currentImageUrl
+
+    if (pendingImageFile) {
+      const ext = pendingImageFile.name.split('.').pop()
+      const path = `artworks/${Date.now()}.${ext}`
+      const { error: uploadErr } = await supabase.storage
+        .from('images')
+        .upload(path, pendingImageFile, { upsert: true })
+      if (uploadErr) {
+        toast('Erreur upload image : ' + uploadErr.message, 'err')
+        $('modalSaveBtn').disabled = false
+        $('modalSaveBtn').textContent = 'Enregistrer'
+        return
+      }
+      const { data: urlData } = supabase.storage.from('images').getPublicUrl(path)
+      image_url = urlData.publicUrl
+    }
+
+    const payload = {
+      title,
+      year: $('fYear').value.trim(),
+      medium: $('fMedium').value.trim(),
+      dimensions: $('fDimensions').value.trim(),
+      status: $('fStatus').value,
+      order_index: parseInt($('fOrder').value) || 0,
+      description: $('fDescription').value.trim(),
+      image_url
+    }
+
+    let error
+    if (editingId) {
+      ({ error } = await supabase.from('artworks').update(payload).eq('id', editingId))
+    } else {
+      ({ error } = await supabase.from('artworks').insert(payload))
+    }
+
+    $('modalSaveBtn').disabled = false
+    $('modalSaveBtn').textContent = 'Enregistrer'
+
+    if (error) { toast('Erreur : ' + error.message, 'err'); return }
+
+    toast(editingId ? 'Œuvre modifiée' : 'Œuvre ajoutée')
+    closeModal()
+    await loadArtworks()
+  })
+
+  // ── ABOUT ─────────────────────────────────────────────────────────────────
+  let pendingPortraitFile = null
+  let currentPortraitUrl = null
+
+  async function loadAbout() {
+    const { data, error } = await supabase.from('site_content').select('value').eq('key', 'about').single()
+    if (error || !data) return
+    const v = data.value
+    $('aboutName').value = v.name || ''
+    $('aboutBioShort').value = v.bio_short || ''
+    $('aboutIntro').value = v.intro || ''
+    $('aboutQuote').value = v.quote || ''
+    $('aboutApproach').value = v.approach || ''
+    $('aboutExhibitions').value = (v.exhibitions || []).join('\n')
+    currentPortraitUrl = v.portrait || null
+    if (currentPortraitUrl) {
+      $('portraitCurrent').src = currentPortraitUrl
+      $('portraitCurrent').style.display = 'block'
+      $('portraitUploadText').textContent = 'Cliquer pour changer la photo'
+    }
+  }
+
+  $('portraitUploadArea').addEventListener('click', () => $('portraitFile').click())
+  $('portraitFile').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    pendingPortraitFile = file
+    const preview = $('portraitPreview')
+    preview.src = URL.createObjectURL(file)
+    preview.style.display = 'block'
+    $('portraitCurrent').style.display = 'none'
+    $('portraitUploadText').textContent = file.name
+  })
+
+  $('saveAboutBtn').addEventListener('click', async () => {
+    $('saveAboutBtn').disabled = true
+    $('saveAboutBtn').textContent = 'Enregistrement…'
+
+    let portrait = currentPortraitUrl
+    if (pendingPortraitFile) {
+      const ext = pendingPortraitFile.name.split('.').pop()
+      const path = `site/portrait.${ext}`
+      await supabase.storage.from('images').upload(path, pendingPortraitFile, { upsert: true })
+      const { data: urlData } = supabase.storage.from('images').getPublicUrl(path)
+      portrait = urlData.publicUrl
+    }
+
+    const value = {
+      name: $('aboutName').value.trim(),
+      bio_short: $('aboutBioShort').value.trim(),
+      intro: $('aboutIntro').value.trim(),
+      quote: $('aboutQuote').value.trim(),
+      approach: $('aboutApproach').value.trim(),
+      portrait,
+      exhibitions: $('aboutExhibitions').value.split('\n').map(s => s.trim()).filter(Boolean)
+    }
+
+    const { error } = await supabase.from('site_content').upsert({ key: 'about', value })
+    $('saveAboutBtn').disabled = false
+    $('saveAboutBtn').textContent = 'Enregistrer'
+    if (error) { toast('Erreur : ' + error.message, 'err'); return }
+    toast('Page À propos enregistrée')
+  })
+
+  // ── CONTACT ───────────────────────────────────────────────────────────────
+  async function loadContact() {
+    const { data, error } = await supabase.from('site_content').select('value').eq('key', 'contact').single()
+    if (error || !data) return
+    const v = data.value
+    $('contactEmail').value = v.email || ''
+    $('contactInstagram').value = v.instagram || ''
+    $('contactInstagramUrl').value = v.instagram_url || ''
+    $('contactAddress').value = v.address || ''
+    $('contactMessage').value = v.message || ''
+  }
+
+  $('saveContactBtn').addEventListener('click', async () => {
+    $('saveContactBtn').disabled = true
+    $('saveContactBtn').textContent = 'Enregistrement…'
+
+    const value = {
+      email: $('contactEmail').value.trim(),
+      instagram: $('contactInstagram').value.trim(),
+      instagram_url: $('contactInstagramUrl').value.trim(),
+      address: $('contactAddress').value.trim(),
+      message: $('contactMessage').value.trim()
+    }
+
+    const { error } = await supabase.from('site_content').upsert({ key: 'contact', value })
+    $('saveContactBtn').disabled = false
+    $('saveContactBtn').textContent = 'Enregistrer'
+    if (error) { toast('Erreur : ' + error.message, 'err'); return }
+    toast('Page Contact enregistrée')
+  })
+</script>
 </body>
 </html>

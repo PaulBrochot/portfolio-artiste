@@ -1,44 +1,50 @@
-/* Fetches content JSON files and exposes them */
-const cache = {};
-
-async function load(url) {
-  if (cache[url]) return cache[url];
-  const r = await fetch(url);
-  cache[url] = await r.json();
-  return cache[url];
-}
+import { supabase } from './supabase.js'
 
 export async function getArtworks() {
-  const data = await load('/content/artworks.json');
-  return data.artworks;
+  const { data, error } = await supabase
+    .from('artworks')
+    .select('*')
+    .order('order_index', { ascending: true })
+  if (error) throw error
+  return data.map(a => ({ ...a, id: String(a.id), image: a.image_url }))
 }
 
 export async function getAbout() {
-  return load('/content/about.json');
+  const { data, error } = await supabase
+    .from('site_content')
+    .select('value')
+    .eq('key', 'about')
+    .single()
+  if (error) throw error
+  return data.value
 }
 
 export async function getContact() {
-  return load('/content/contact.json');
+  const { data, error } = await supabase
+    .from('site_content')
+    .select('value')
+    .eq('key', 'contact')
+    .single()
+  if (error) throw error
+  return data.value
 }
 
-/* Render gallery grid into a container element */
 export function renderGalleryGrid(artworks, container, basePath = '') {
   container.innerHTML = artworks.map(a => `
-    <a href="${basePath}oeuvres/oeuvre-${a.id}.html" class="gallery-item">
+    <a href="${basePath}oeuvres/oeuvre.html?id=${a.id}" class="gallery-item">
       <div class="gallery-item__img">
         <img src="${a.image}" alt="${a.title}" loading="lazy">
       </div>
       <p class="gallery-item__title">${a.title}</p>
       <p class="gallery-item__meta">${a.year} · ${a.medium} · ${a.dimensions}</p>
     </a>
-  `).join('');
+  `).join('')
 }
 
-/* Render the 4-item home grid */
 export function renderHomeGrid(artworks, container) {
-  const items = artworks.slice(0, 4);
+  const items = artworks.slice(0, 4)
   container.innerHTML = items.map((a, i) => `
-    <a href="oeuvres/oeuvre-${a.id}.html" class="work-item${i === 0 ? ' work-item--featured' : ''}">
+    <a href="oeuvres/oeuvre.html?id=${a.id}" class="work-item${i === 0 ? ' work-item--featured' : ''}">
       <div class="work-item__img-wrap">
         <img src="${a.image}" alt="${a.title}" loading="lazy">
       </div>
@@ -48,20 +54,19 @@ export function renderHomeGrid(artworks, container) {
       </div>
       <p class="work-item__sub">${a.medium} — ${a.dimensions}</p>
     </a>
-  `).join('');
+  `).join('')
 }
 
-/* Render a single artwork page */
 export function renderArtwork(artwork, artworks, container) {
-  const idx = artworks.findIndex(a => a.id === artwork.id);
-  const prev = artworks[idx - 1];
-  const next = artworks[idx + 1];
+  const idx = artworks.findIndex(a => a.id === artwork.id)
+  const prev = artworks[idx - 1]
+  const next = artworks[idx + 1]
 
   const statusClass = artwork.status === 'Disponible'
     ? 'artwork-status--available'
     : artwork.status === 'Vendu'
     ? 'artwork-status--sold'
-    : '';
+    : ''
 
   container.innerHTML = `
     <div class="artwork-header">
@@ -94,7 +99,7 @@ export function renderArtwork(artwork, artworks, container) {
     </div>
     <div class="artwork-nav">
       ${prev ? `
-        <a href="oeuvre-${prev.id}.html" class="artwork-nav__item">
+        <a href="oeuvre.html?id=${prev.id}" class="artwork-nav__item">
           <span class="artwork-nav__label">Précédente</span>
           <span class="artwork-nav__title">← ${prev.title}</span>
         </a>` : '<div style="min-width:160px;"></div>'}
@@ -102,10 +107,10 @@ export function renderArtwork(artwork, artworks, container) {
         <a href="../galerie.html">Toutes les œuvres</a>
       </div>
       ${next ? `
-        <a href="oeuvre-${next.id}.html" class="artwork-nav__item artwork-nav__item--next">
+        <a href="oeuvre.html?id=${next.id}" class="artwork-nav__item artwork-nav__item--next">
           <span class="artwork-nav__label">Suivante</span>
           <span class="artwork-nav__title">${next.title} →</span>
         </a>` : '<div style="min-width:160px;"></div>'}
     </div>
-  `;
+  `
 }
