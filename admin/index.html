@@ -417,15 +417,52 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-  const supabase = createClient(
-    'https://yybnufouzafwmejegbni.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Ym51Zm91emFmd21lamVnYm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODQyNDcsImV4cCI6MjA5NDg2MDI0N30.GpkMY1iZ98PpHtx3_Td-rGbMz_ph4QVdpdodJ6S5m9c'
-  )
+<script>
+  const BASE = 'https://yybnufouzafwmejegbni.supabase.co'
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Ym51Zm91emFmd21lamVnYm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODQyNDcsImV4cCI6MjA5NDg2MDI0N30.GpkMY1iZ98PpHtx3_Td-rGbMz_ph4QVdpdodJ6S5m9c'
+  const TOKEN_KEY = 'sb_admin_token'
 
   const $ = id => document.getElementById(id)
+
+  // ── API HELPERS ────────────────────────────────────────────────────────────
+  function getToken() { return localStorage.getItem(TOKEN_KEY) }
+  function setToken(t) { localStorage.setItem(TOKEN_KEY, t) }
+  function clearToken() { localStorage.removeItem(TOKEN_KEY) }
+
+  function authHeaders() {
+    return { 'apikey': ANON, 'Authorization': `Bearer ${getToken() || ANON}`, 'Content-Type': 'application/json' }
+  }
+
+  async function api(path, opts = {}) {
+    const r = await fetch(BASE + path, { headers: authHeaders(), ...opts })
+    if (!r.ok) { const t = await r.text(); throw new Error(t) }
+    return r.status === 204 ? null : r.json()
+  }
+
+  async function dbGet(table, params = '') {
+    return api(`/rest/v1/${table}?${params}`)
+  }
+  async function dbInsert(table, body) {
+    return api(`/rest/v1/${table}`, { method: 'POST', headers: { ...authHeaders(), 'Prefer': 'return=representation' }, body: JSON.stringify(body) })
+  }
+  async function dbUpdate(table, id, body) {
+    return api(`/rest/v1/${table}?id=eq.${id}`, { method: 'PATCH', headers: { ...authHeaders(), 'Prefer': 'return=representation' }, body: JSON.stringify(body) })
+  }
+  async function dbDelete(table, id) {
+    return api(`/rest/v1/${table}?id=eq.${id}`, { method: 'DELETE' })
+  }
+  async function dbUpsert(table, body) {
+    return api(`/rest/v1/${table}`, { method: 'POST', headers: { ...authHeaders(), 'Prefer': 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(body) })
+  }
+  async function uploadFile(path, file) {
+    const r = await fetch(`${BASE}/storage/v1/object/images/${path}`, {
+      method: 'POST',
+      headers: { 'apikey': ANON, 'Authorization': `Bearer ${getToken()}`, 'x-upsert': 'true' },
+      body: file
+    })
+    if (!r.ok) throw new Error(await r.text())
+    return `${BASE}/storage/v1/object/public/images/${path}`
+  }
 
   // ── TOAST ──────────────────────────────────────────────────────────────────
   function toast(msg, type = 'ok') {
@@ -449,13 +486,7 @@
     await loadContact()
   }
 
-  const { data: { session } } = await supabase.auth.getSession()
-  if (session) { await showAdmin() } else { showLogin() }
-
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN') await showAdmin()
-    if (event === 'SIGNED_OUT') showLogin()
-  })
+  if (getToken()) { showAdmin() } else { showLogin() }
 
   $('loginBtn').addEventListener('click', async () => {
     const email = $('loginEmail').value.trim()
@@ -463,10 +494,21 @@
     $('loginError').textContent = ''
     $('loginBtn').disabled = true
     $('loginBtn').textContent = 'Connexion…'
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const r = await fetch(`${BASE}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'apikey': ANON, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await r.json()
+      if (!r.ok) throw new Error(data.error_description || data.msg)
+      setToken(data.access_token)
+      await showAdmin()
+    } catch(e) {
+      $('loginError').textContent = 'Email ou mot de passe incorrect.'
+    }
     $('loginBtn').disabled = false
     $('loginBtn').textContent = 'Se connecter'
-    if (error) $('loginError').textContent = 'Email ou mot de passe incorrect.'
   })
 
   $('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click() })
@@ -475,17 +517,23 @@
     const email = $('loginEmail').value.trim()
     if (!email) { $('loginError').textContent = 'Entre ton email ci-dessus d\'abord.'; return }
     $('forgotBtn').disabled = true
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/admin/reset.html'
-    })
+    try {
+      const redirectTo = window.location.origin + '/admin/reset.html'
+      await fetch(`${BASE}/auth/v1/recover`, {
+        method: 'POST',
+        headers: { 'apikey': ANON, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, gotrue_meta_security: {} })
+      })
+      $('loginError').textContent = ''
+      $('resetMsg').style.display = 'block'
+      $('resetMsg').textContent = 'Email envoyé ! Vérifie ta boîte mail.'
+    } catch(e) {
+      $('loginError').textContent = 'Erreur : ' + e.message
+    }
     $('forgotBtn').disabled = false
-    if (error) { $('loginError').textContent = 'Erreur : ' + error.message; return }
-    $('loginError').textContent = ''
-    $('resetMsg').style.display = 'block'
-    $('resetMsg').textContent = 'Email envoyé ! Vérifie ta boîte mail.'
   })
 
-  $('logoutBtn').addEventListener('click', () => supabase.auth.signOut())
+  $('logoutBtn').addEventListener('click', () => { clearToken(); showLogin() })
 
   // ── TABS ─────────────────────────────────────────────────────────────────────
   document.querySelectorAll('.tab').forEach(btn => {
@@ -501,12 +549,10 @@
 
   // ── ARTWORKS ─────────────────────────────────────────────────────────────────
   async function loadArtworks() {
-    const { data, error } = await supabase
-      .from('artworks')
-      .select('*')
-      .order('order_index', { ascending: true })
-    if (error) { toast('Erreur de chargement', 'err'); return }
-    renderArtworksList(data)
+    try {
+      const data = await dbGet('artworks', 'select=*&order=order_index.asc')
+      renderArtworksList(data)
+    } catch(e) { toast('Erreur de chargement', 'err') }
   }
 
   function statusLabel(status) {
@@ -596,17 +642,19 @@
   })
 
   window.editArtwork = async function(id) {
-    const { data, error } = await supabase.from('artworks').select('*').eq('id', id).single()
-    if (error) { toast('Erreur', 'err'); return }
-    openModal(data)
+    try {
+      const data = await dbGet('artworks', `select=*&id=eq.${id}`)
+      openModal(data[0])
+    } catch(e) { toast('Erreur', 'err') }
   }
 
   window.deleteArtwork = async function(id, title) {
     if (!confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return
-    const { error } = await supabase.from('artworks').delete().eq('id', id)
-    if (error) { toast('Erreur lors de la suppression', 'err'); return }
-    toast('Œuvre supprimée')
-    await loadArtworks()
+    try {
+      await dbDelete('artworks', id)
+      toast('Œuvre supprimée')
+      await loadArtworks()
+    } catch(e) { toast('Erreur lors de la suppression', 'err') }
   }
 
   $('modalSaveBtn').addEventListener('click', async () => {
@@ -619,19 +667,15 @@
     let image_url = currentImageUrl
 
     if (pendingImageFile) {
-      const ext = pendingImageFile.name.split('.').pop()
-      const path = `artworks/${Date.now()}.${ext}`
-      const { error: uploadErr } = await supabase.storage
-        .from('images')
-        .upload(path, pendingImageFile, { upsert: true })
-      if (uploadErr) {
-        toast('Erreur upload image : ' + uploadErr.message, 'err')
+      try {
+        const ext = pendingImageFile.name.split('.').pop()
+        image_url = await uploadFile(`artworks/${Date.now()}.${ext}`, pendingImageFile)
+      } catch(e) {
+        toast('Erreur upload image : ' + e.message, 'err')
         $('modalSaveBtn').disabled = false
         $('modalSaveBtn').textContent = 'Enregistrer'
         return
       }
-      const { data: urlData } = supabase.storage.from('images').getPublicUrl(path)
-      image_url = urlData.publicUrl
     }
 
     const payload = {
@@ -645,21 +689,16 @@
       image_url
     }
 
-    let error
-    if (editingId) {
-      ({ error } = await supabase.from('artworks').update(payload).eq('id', editingId))
-    } else {
-      ({ error } = await supabase.from('artworks').insert(payload))
-    }
+    try {
+      if (editingId) { await dbUpdate('artworks', editingId, payload) }
+      else { await dbInsert('artworks', payload) }
+      toast(editingId ? 'Œuvre modifiée' : 'Œuvre ajoutée')
+      closeModal()
+      await loadArtworks()
+    } catch(e) { toast('Erreur : ' + e.message, 'err') }
 
     $('modalSaveBtn').disabled = false
     $('modalSaveBtn').textContent = 'Enregistrer'
-
-    if (error) { toast('Erreur : ' + error.message, 'err'); return }
-
-    toast(editingId ? 'Œuvre modifiée' : 'Œuvre ajoutée')
-    closeModal()
-    await loadArtworks()
   })
 
   // ── ABOUT ─────────────────────────────────────────────────────────────────
@@ -667,21 +706,23 @@
   let currentPortraitUrl = null
 
   async function loadAbout() {
-    const { data, error } = await supabase.from('site_content').select('value').eq('key', 'about').single()
-    if (error || !data) return
-    const v = data.value
-    $('aboutName').value = v.name || ''
-    $('aboutBioShort').value = v.bio_short || ''
-    $('aboutIntro').value = v.intro || ''
-    $('aboutQuote').value = v.quote || ''
-    $('aboutApproach').value = v.approach || ''
-    $('aboutExhibitions').value = (v.exhibitions || []).join('\n')
-    currentPortraitUrl = v.portrait || null
-    if (currentPortraitUrl) {
-      $('portraitCurrent').src = currentPortraitUrl
-      $('portraitCurrent').style.display = 'block'
-      $('portraitUploadText').textContent = 'Cliquer pour changer la photo'
-    }
+    try {
+      const data = await dbGet('site_content', 'select=value&key=eq.about')
+      if (!data[0]) return
+      const v = data[0].value
+      $('aboutName').value = v.name || ''
+      $('aboutBioShort').value = v.bio_short || ''
+      $('aboutIntro').value = v.intro || ''
+      $('aboutQuote').value = v.quote || ''
+      $('aboutApproach').value = v.approach || ''
+      $('aboutExhibitions').value = (v.exhibitions || []).join('\n')
+      currentPortraitUrl = v.portrait || null
+      if (currentPortraitUrl) {
+        $('portraitCurrent').src = currentPortraitUrl
+        $('portraitCurrent').style.display = 'block'
+        $('portraitUploadText').textContent = 'Cliquer pour changer la photo'
+      }
+    } catch(e) {}
   }
 
   $('portraitUploadArea').addEventListener('click', () => $('portraitFile').click())
@@ -702,11 +743,10 @@
 
     let portrait = currentPortraitUrl
     if (pendingPortraitFile) {
-      const ext = pendingPortraitFile.name.split('.').pop()
-      const path = `site/portrait.${ext}`
-      await supabase.storage.from('images').upload(path, pendingPortraitFile, { upsert: true })
-      const { data: urlData } = supabase.storage.from('images').getPublicUrl(path)
-      portrait = urlData.publicUrl
+      try {
+        const ext = pendingPortraitFile.name.split('.').pop()
+        portrait = await uploadFile(`site/portrait.${ext}`, pendingPortraitFile)
+      } catch(e) {}
     }
 
     const value = {
@@ -719,29 +759,31 @@
       exhibitions: $('aboutExhibitions').value.split('\n').map(s => s.trim()).filter(Boolean)
     }
 
-    const { error } = await supabase.from('site_content').upsert({ key: 'about', value })
+    try {
+      await dbUpsert('site_content', { key: 'about', value })
+      toast('Page À propos enregistrée')
+    } catch(e) { toast('Erreur : ' + e.message, 'err') }
     $('saveAboutBtn').disabled = false
     $('saveAboutBtn').textContent = 'Enregistrer'
-    if (error) { toast('Erreur : ' + error.message, 'err'); return }
-    toast('Page À propos enregistrée')
   })
 
   // ── CONTACT ───────────────────────────────────────────────────────────────
   async function loadContact() {
-    const { data, error } = await supabase.from('site_content').select('value').eq('key', 'contact').single()
-    if (error || !data) return
-    const v = data.value
-    $('contactEmail').value = v.email || ''
-    $('contactInstagram').value = v.instagram || ''
-    $('contactInstagramUrl').value = v.instagram_url || ''
-    $('contactAddress').value = v.address || ''
-    $('contactMessage').value = v.message || ''
+    try {
+      const data = await dbGet('site_content', 'select=value&key=eq.contact')
+      if (!data[0]) return
+      const v = data[0].value
+      $('contactEmail').value = v.email || ''
+      $('contactInstagram').value = v.instagram || ''
+      $('contactInstagramUrl').value = v.instagram_url || ''
+      $('contactAddress').value = v.address || ''
+      $('contactMessage').value = v.message || ''
+    } catch(e) {}
   }
 
   $('saveContactBtn').addEventListener('click', async () => {
     $('saveContactBtn').disabled = true
     $('saveContactBtn').textContent = 'Enregistrement…'
-
     const value = {
       email: $('contactEmail').value.trim(),
       instagram: $('contactInstagram').value.trim(),
@@ -749,12 +791,12 @@
       address: $('contactAddress').value.trim(),
       message: $('contactMessage').value.trim()
     }
-
-    const { error } = await supabase.from('site_content').upsert({ key: 'contact', value })
+    try {
+      await dbUpsert('site_content', { key: 'contact', value })
+      toast('Page Contact enregistrée')
+    } catch(e) { toast('Erreur : ' + e.message, 'err') }
     $('saveContactBtn').disabled = false
     $('saveContactBtn').textContent = 'Enregistrer'
-    if (error) { toast('Erreur : ' + error.message, 'err'); return }
-    toast('Page Contact enregistrée')
   })
 </script>
 </body>

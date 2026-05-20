@@ -59,18 +59,16 @@
     </p>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  <script>
+    const BASE = 'https://yybnufouzafwmejegbni.supabase.co'
+    const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Ym51Zm91emFmd21lamVnYm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODQyNDcsImV4cCI6MjA5NDg2MDI0N30.GpkMY1iZ98PpHtx3_Td-rGbMz_ph4QVdpdodJ6S5m9c'
+    const TOKEN_KEY = 'sb_admin_token'
 
-    const supabase = createClient(
-      'https://yybnufouzafwmejegbni.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Ym51Zm91emFmd21lamVnYm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODQyNDcsImV4cCI6MjA5NDg2MDI0N30.GpkMY1iZ98PpHtx3_Td-rGbMz_ph4QVdpdodJ6S5m9c'
-    )
+    // Récupère le token depuis le hash de l'URL (lien email Supabase)
+    const hash = Object.fromEntries(new URLSearchParams(window.location.hash.slice(1)))
+    const token = hash.access_token
 
-    // Supabase place le token dans le hash quand on arrive depuis un lien email
-    const { data: { session }, error: sessionErr } = await supabase.auth.getSession()
-
-    if (!session) {
+    if (!token) {
       document.getElementById('err').textContent = 'Lien invalide ou expiré. Demande un nouvel email de réinitialisation.'
       document.getElementById('saveBtn').disabled = true
     }
@@ -87,17 +85,22 @@
       document.getElementById('saveBtn').disabled = true
       document.getElementById('saveBtn').textContent = 'Enregistrement…'
 
-      const { error } = await supabase.auth.updateUser({ password: pwd })
-
-      if (error) {
-        err.textContent = 'Erreur : ' + error.message
+      try {
+        const r = await fetch(`${BASE}/auth/v1/user`, {
+          method: 'PUT',
+          headers: { 'apikey': ANON, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd })
+        })
+        if (!r.ok) throw new Error((await r.json()).msg || 'Erreur')
+        // Sauvegarde le token pour connexion directe
+        localStorage.setItem(TOKEN_KEY, token)
+        document.getElementById('formWrap').style.display = 'none'
+        document.getElementById('ok').style.display = 'block'
+      } catch(e) {
+        err.textContent = 'Erreur : ' + e.message
         document.getElementById('saveBtn').disabled = false
         document.getElementById('saveBtn').textContent = 'Enregistrer le mot de passe'
-        return
       }
-
-      document.getElementById('formWrap').style.display = 'none'
-      document.getElementById('ok').style.display = 'block'
     })
   </script>
 </body>

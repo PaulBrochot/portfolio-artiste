@@ -1,32 +1,18 @@
-import { supabase } from './supabase.js'
+import { dbGet } from './supabase.js'
 
 export async function getArtworks() {
-  const { data, error } = await supabase
-    .from('artworks')
-    .select('*')
-    .order('order_index', { ascending: true })
-  if (error) throw error
+  const data = await dbGet('artworks', 'select=*&order=order_index.asc')
   return data.map(a => ({ ...a, id: String(a.id), image: a.image_url }))
 }
 
 export async function getAbout() {
-  const { data, error } = await supabase
-    .from('site_content')
-    .select('value')
-    .eq('key', 'about')
-    .single()
-  if (error) throw error
-  return data.value
+  const data = await dbGet('site_content', 'select=value&key=eq.about')
+  return data[0]?.value
 }
 
 export async function getContact() {
-  const { data, error } = await supabase
-    .from('site_content')
-    .select('value')
-    .eq('key', 'contact')
-    .single()
-  if (error) throw error
-  return data.value
+  const data = await dbGet('site_content', 'select=value&key=eq.contact')
+  return data[0]?.value
 }
 
 export function renderGalleryGrid(artworks, container, basePath = '') {
